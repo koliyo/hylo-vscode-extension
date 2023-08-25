@@ -1,0 +1,142 @@
+{
+  "name": "hyloc-lsp",
+  "displayName": "hyloc-lsp",
+  "description": "Hyloc LSP",
+  "license": "MIT",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.81.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:hylo"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "vscode:all": "npm run compile && npm run vscode:package",
+    "vscode:package": "vsce package",
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.5.1",
+    "@types/vscode": "^1.81.0",
+    "@types/ws": "^8.5.5",
+    "@typescript-eslint/eslint-plugin": "^5.59.8",
+    "@typescript-eslint/parser": "^5.59.8",
+    "@vscode/test-electron": "^2.3.2",
+    "eslint": "^8.41.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "jsonc-parser": "^3.2.0",
+    "vscode-languageclient": "^8.1.0",
+    "web-tree-sitter": "^0.20.8",
+    "ws": "^8.13.0"
+  },
+  "contributes": {
+    "configurationDefaults": {
+      "[hylo]": {
+        "editor.semanticTokenColorCustomizations": {
+          "enabled": true
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "hylo",
+        "aliases": [],
+        "extensions": [
+          ".hylo"
+        ],
+        "configuration": "./language-configuration-hylo.json"
+      }
+    ],
+    "semanticTokenTypes": [
+      {
+        "id": "punctuation",
+        "description": "Punctuation symbols"
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "scopes": {
+          "punctuation": [
+            "punctuation"
+          ],
+          "punctuation.curlybrace": [
+            "punctuation.curlybrace"
+          ],
+          "foo": [
+            "punctuation.curlybrace.close.cs",
+            "source.cs"
+          ],
+          "type.modification": [
+            "storage.modifier"
+          ]
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "hylo.startLspLogStreaming",
+        "title": "Start Stream Logs into lspInspector.port"
+      }
+    ],
+    "configuration": {
+      "title": "{Syntax Highlighter} configuration",
+      "properties": {
+        "hylo.rootDirectory": {
+          "type": "string",
+          "scope": "window",
+          "description": "Path to hylo directory"
+        },
+        "hylo.disableLsp": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "description": "Disable LSP backend, only provide syntax highlighting."
+        },
+        "hylo.trace.server": {
+          "scope": "window",
+          "type": "object",
+          "description": "Traces the communication between VS Code and the language server.",
+          "default": {
+            "verbosity": "messages",
+            "format": "text"
+          },
+          "properties": {
+            "verbosity": {
+              "type": "string",
+              "description": "Controls the verbosity of the trace.",
+              "enum": [
+                "off",
+                "messages",
+                "verbose"
+              ]
+            },
+            "format": {
+              "type": "string",
+              "description": "Controls the output format of the trace.",
+              "enum": [
+                "text",
+                "json"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+
+}
