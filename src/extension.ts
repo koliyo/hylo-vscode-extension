@@ -30,8 +30,6 @@ import {
   Trace
 } from 'vscode-languageclient/node'
 
-import * as Parser from 'web-tree-sitter'
-import * as jsonc from 'jsonc-parser'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -55,8 +53,8 @@ function expandvars(s: string) {
 let defaultOutput: OutputChannel
 let wrappedOutput: OutputChannel
 let hyloLpsConfig: WorkspaceConfiguration
-let isDebug = process.env.VSCODE_DEBUG_MODE !== undefined
-// let isDebug = true
+// let isDebug = process.env.VSCODE_DEBUG_MODE !== undefined
+let isDebug = true
 
 function createOutputChannels() {
   defaultOutput = window.createOutputChannel('Hylo')
@@ -122,44 +120,33 @@ async function activateBackend(context: ExtensionContext) {
     return
   }
 
-  let socket: WebSocket | null = null
-
-  // defaultOutput.appendLine("hello!!")
-
   // If the extension is launched in debug mode then the debug server options are used
   // Otherwise the run options are used
   wrappedOutput.appendLine(`Working directory: ${process.cwd()}, activeDebugSession: ${debug.activeDebugSession}, isDebug: ${isDebug}`)
   wrappedOutput.appendLine(`__filename: ${__filename}`)
   // The server is implemented in node
-  let serverExe = '/Users/nils/Work/hylo-lsp/.build/arm64-apple-macosx/debug/hylo-lsp-executable'
+  let serverExe = '/Users/nils/Work/hylo-lsp/.build/arm64-apple-macosx/debug/hylo-lsp-server'
 
   let hyloRoot = ''
-  // let env: any = null
-
-  // if (isDebug) {
-  //   hyloRoot = `${context.extensionPath}/../..`
-  // }
-  // else {
-  //   hyloRoot = hyloLpsConfig.get('rootDirectory')!
-  //   if (!hyloRoot) {
-  //     await window.showErrorMessage(`Must define \`hylo.rootDirectory\` in settings`)
-  //   }
-
-  //   hyloRoot = expandvars(hyloRoot)
-  // }
-
   let env = process.env;
-  // env['BRAVO_LIB_DIR'] = `${hyloRoot}/_dotnet_build/Debug/net7.0`;
+
+  if (isDebug) {
+    hyloRoot = `${context.extensionPath}/../..`
+  }
+  else {
+    hyloRoot = hyloLpsConfig.get('rootDirectory')!
+    if (!hyloRoot) {
+      await window.showErrorMessage(`Must define \`hylo.rootDirectory\` in settings`)
+    }
+
+    hyloRoot = expandvars(hyloRoot)
+  }
+
 
 
   wrappedOutput.appendLine(`Hylo root directory: ${hyloRoot}`)
-  // wrappedOutput.appendLine(`Env: ${env}`)
 
-  // let transport = TransportKind.socket
-  let transport = {
-    kind: TransportKind.socket,
-    port: 55880
-  }
+  let transport = TransportKind.pipe
 
   let executable: Executable = {
     command: serverExe,
@@ -182,8 +169,8 @@ async function activateBackend(context: ExtensionContext) {
   let clientOptions: LanguageClientOptions = {
     // Register the server for plain text documents
     documentSelector: [
-      // { scheme: 'file', language: 'bml' }
-      { pattern: '**/*.bml', }
+      // { scheme: 'file', language: 'hylo' }
+      { pattern: '**/*.hylo', }
     ],
     synchronize: {
       // Synchronize the setting section 'languageServerExample' to the server
@@ -200,8 +187,17 @@ async function activateBackend(context: ExtensionContext) {
   let forceDebug = false
   client = new LanguageClient('hylo', 'Hylo LSP Extension', serverOptions, clientOptions, forceDebug)
   client.registerProposedFeatures()
-  client.setTrace(Trace.Verbose)
-  client.start()
+  client.setTrace(Trace.Messages)
+  let p = client.start()
+  p.catch(reason => {
+    wrappedOutput.appendLine(`Client error: ${reason}`)
+  })
+
+  p.finally(() => {
+    wrappedOutput.appendLine(`Client finally`)
+
+  });
+
 }
 
 export async function activate(context: ExtensionContext) {
