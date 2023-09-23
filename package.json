@@ -3,7 +3,11 @@
   "displayName": "hyloc-lsp",
   "description": "Hyloc LSP",
   "license": "MIT",
-  "version": "0.0.1",
+  "version": "0.5.0",
+  "repository": {
+    "type": "git",
+    "url": "https://koliyo/hylo-lsp-vs-code.git"
+  },
   "engines": {
     "vscode": "^1.81.0"
   },
@@ -16,11 +20,11 @@
   "main": "./out/extension.js",
   "scripts": {
     "vscode:all": "npm run compile && npm run vscode:package",
-    "vscode:package": "vsce package",
-    "vscode:prepublish": "yarn run compile",
+    "vscode:package": "vsce package --no-yarn",
+    "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "yarn run compile && yarn run lint",
+    "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
@@ -33,6 +37,7 @@
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
     "@vscode/test-electron": "^2.3.2",
+    "@vscode/vsce": "^2.21.0",
     "eslint": "^8.41.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
