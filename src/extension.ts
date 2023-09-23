@@ -53,8 +53,7 @@ function expandvars(s: string) {
 let defaultOutput: OutputChannel
 let wrappedOutput: OutputChannel
 let hyloLpsConfig: WorkspaceConfiguration
-// let isDebug = process.env.VSCODE_DEBUG_MODE !== undefined
-let isDebug = true
+let isDebug = process.env.VSCODE_DEBUG_MODE !== undefined
 
 function createOutputChannels() {
   defaultOutput = window.createOutputChannel('Hylo')
@@ -125,26 +124,28 @@ async function activateBackend(context: ExtensionContext) {
   wrappedOutput.appendLine(`Working directory: ${process.cwd()}, activeDebugSession: ${debug.activeDebugSession}, isDebug: ${isDebug}`)
   wrappedOutput.appendLine(`__filename: ${__filename}`)
   // The server is implemented in node
-  let serverExe = '/Users/nils/Work/hylo-lsp/.build/arm64-apple-macosx/debug/hylo-lsp-server'
+  let serverExe: string
 
-  let hyloRoot = ''
+  let hyloRoot = undefined
   let env = process.env;
 
   if (isDebug) {
     hyloRoot = `${context.extensionPath}/../..`
+    serverExe = '/Users/nils/Work/hylo-lsp/.build/arm64-apple-macosx/debug/hylo-lsp-server'
   }
   else {
-    hyloRoot = hyloLpsConfig.get('rootDirectory')!
-    if (!hyloRoot) {
-      await window.showErrorMessage(`Must define \`hylo.rootDirectory\` in settings`)
-    }
+    // hyloRoot = hyloLpsConfig.get('rootDirectory')!
+    // if (!hyloRoot) {
+    //   await window.showErrorMessage(`Must define \`hylo.rootDirectory\` in settings`)
+    // }
 
-    hyloRoot = expandvars(hyloRoot)
+    // hyloRoot = expandvars(hyloRoot)
+    serverExe = `${context.extensionPath}/bin/mac/arm64/hylo-lsp-server`
   }
 
 
 
-  wrappedOutput.appendLine(`Hylo root directory: ${hyloRoot}`)
+  wrappedOutput.appendLine(`Hylo root directory: ${hyloRoot}, lsp server executable: ${serverExe}`)
 
   let transport = TransportKind.pipe
 
