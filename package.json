@@ -19,7 +19,6 @@
   ],
   "main": "./out/extension.js",
   "scripts": {
-    "vscode:all": "npm run compile && npm run vscode:package",
     "vscode:package": "vsce package --no-yarn",
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
