@@ -140,7 +140,8 @@ async function activateBackend(context: ExtensionContext) {
     // }
 
     // hyloRoot = expandvars(hyloRoot)
-    serverExe = `${context.extensionPath}/bin/mac/arm64/hylo-lsp-server`
+    env['HYLO_STDLIB_PATH'] = `${context.extensionPath}/dist/stdlib`
+    serverExe = `${context.extensionPath}/dist/bin/mac/arm64/hylo-lsp-server`
   }
 
 
