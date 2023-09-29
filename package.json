@@ -1,12 +1,12 @@
 {
-  "name": "hyloc-lsp",
-  "displayName": "hyloc-lsp",
-  "description": "Hyloc LSP",
+  "name": "hylo-lang",
+  "displayName": "Hylo",
+  "description": "Hylo Language Support for VSCode",
   "license": "MIT",
   "version": "0.5.0",
   "repository": {
     "type": "git",
-    "url": "https://koliyo/hylo-lsp-vs-code.git"
+    "url": "https://koliyo/hylo-vscode-extension.git"
   },
   "engines": {
     "vscode": "^1.81.0"
