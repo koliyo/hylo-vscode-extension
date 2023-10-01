@@ -1,0 +1,46 @@
+name: Publish release version
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-and-test.yml
+  publish-release:
+    needs: [build]
+    strategy:
+      fail-fast: false
+
+      matrix:
+        host: [
+          {
+            type: macos, os: macos-13,
+            build-options: "--build-tests -Xswiftc -enable-testing",
+            # No coverage support on MacOS
+            test-options: "-v"
+          }
+        ]
+
+    runs-on: ${{ matrix.host.os }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Download VSCode extension artifact
+      id: download-artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: build-and-test.yml
+        name: vscode-extension-artifacts
+
+    - name: Display structure of downloaded files
+      run: ls -R
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          CHANGELOG.md
+          LICENSE
+          vscode-extension-artifacts/*.vsix
