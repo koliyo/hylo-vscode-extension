@@ -1,0 +1,84 @@
+name: Build and test
+
+# README:
+#
+# The semantics for running shell commands in GitHub actions is non-obvious. Please read
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsshell
+# before modifying this file. Our strategy is to rely on the built-in (unspecified) shell, and
+# explicitly set the shell settings we want (with `set -eo pipefail`) at the beginning of any
+# bash script. For more information on these settings, see `man bash`.
+#
+# GitHub Actions files can be difficult to modify with confidence, because testing changes often
+# requires pushing to a branch and running CI remotely. To make this process easier, consider
+# the following:
+#
+# 1) Use Visual Studio Code with the GitHub Actions Extension (github.vscode-github-actions).
+#    This allows you to check the validity of your action schema and syntax without pushing to a
+#    branch.
+# 2) Use https://github.com/nektos/act to run your CI steps locally. Note this will only work with
+#    steps run on Linux platforms, as `act` is implemented with Docker containers.
+
+on:
+  workflow_call:
+  push:
+    # tags: ["v*.*.*"]
+    branches: [ main ]
+    paths-ignore:
+      - "Docs/**"
+      - "**.md"
+      - "README.md"
+      - "LICENSE"
+      - ".gitignore"
+  pull_request:
+    branches: [ "**" ]
+    paths-ignore:
+      - "Docs/**"
+      - "**.md"
+      - "README.md"
+      - "LICENSE"
+      - ".gitignore"
+
+jobs:
+  build-vscode-extension:
+    name: "Native: ${{ matrix.host.os }}/${{ matrix.configuration }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        host: [
+          {
+            type: linux, os: ubuntu-latest,
+          }
+        ]
+
+    runs-on: ${{ matrix.host.os }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 20
+
+    - name: Package VSCode extension (${{ matrix.configuration }})
+      run: |
+        set -eo pipefail
+        # BUILD_DIR=$(swift build -c ${{ matrix.configuration }} --show-bin-path)
+        # DIST_DIR=hylo-vscode-extension/dist
+        # mkdir -p $DIST_DIR
+        # rm -rf $DIST_DIR/stdlib
+        # cp -Rp hylo/Library/Hylo $DIST_DIR/stdlib
+        # mkdir -p $DIST_DIR/bin/mac/arm64
+        # cp -fv $BUILD_DIR/hylo-lsp-server $DIST_DIR/bin/mac/arm64
+        # cd hylo-vscode-extension
+        # npm install
+        # npm run vscode:package
+
+    # - name: Upload VSCode extension artifacts (${{ matrix.configuration }})
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: vscode-extension-artifacts
+    #     path: |
+    #       hylo-vscode-extension/*.vsix
+    #       dist
+    #       !dist/**/*.md
+
