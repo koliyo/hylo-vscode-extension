@@ -65,7 +65,7 @@ jobs:
         # Expected format {owner}/{repo}
         # Default: ${{ github.repository }}
         repository: koliyo/hylo-lsp
-        tag: "v0.5.0"
+        tag: "v0.5.1"
         # extract: true
         out-file-path: hylo-lsp-artifacts
 
@@ -77,7 +77,7 @@ jobs:
         DIST_DIR=dist
         mkdir -p $DIST_DIR
         rm -rf $DIST_DIR/stdlib
-        cp -Rp hylo/Library/Hylo $DIST_DIR/stdlib
+        cp -Rp hylo-lsp-artifacts/hylo/Library/Hylo $DIST_DIR/stdlib
         mkdir -p $DIST_DIR/bin/mac/arm64
         cp -fv hylo-lsp-artifacts/hylo-lsp-server $DIST_DIR/bin/mac/arm64
         npm install
