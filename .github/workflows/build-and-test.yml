@@ -65,7 +65,8 @@ jobs:
         # Expected format {owner}/{repo}
         # Default: ${{ github.repository }}
         repository: koliyo/hylo-lsp
-        tag: ${{github.ref_name}}
+        latest: ${{ github.ref == 'refs/heads/main' && 'true' || 'false' }}
+        tag: ${{ github.ref == 'refs/heads/main' && '' || format(github.ref_name) }}
         extract: false
         out-file-path: hylo-lsp-artifacts
 
