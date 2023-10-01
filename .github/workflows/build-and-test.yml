@@ -67,22 +67,21 @@ jobs:
         repository: koliyo/hylo-lsp
         tag: "v0.5.0"
         # extract: true
+        out-file-path: hylo-lsp-artifacts
 
     - run: ls -R
 
     - name: Package VSCode extension
       run: |
         set -eo pipefail
-        # BUILD_DIR=$(swift build -c ${{ matrix.configuration }} --show-bin-path)
-        # DIST_DIR=hylo-vscode-extension/dist
-        # mkdir -p $DIST_DIR
-        # rm -rf $DIST_DIR/stdlib
-        # cp -Rp hylo/Library/Hylo $DIST_DIR/stdlib
-        # mkdir -p $DIST_DIR/bin/mac/arm64
-        # cp -fv $BUILD_DIR/hylo-lsp-server $DIST_DIR/bin/mac/arm64
-        # cd hylo-vscode-extension
-        # npm install
-        # npm run vscode:package
+        DIST_DIR=dist
+        mkdir -p $DIST_DIR
+        rm -rf $DIST_DIR/stdlib
+        cp -Rp hylo/Library/Hylo $DIST_DIR/stdlib
+        mkdir -p $DIST_DIR/bin/mac/arm64
+        cp -fv hylo-lsp-artifacts/hylo-lsp-server $DIST_DIR/bin/mac/arm64
+        npm install
+        npm run vscode:package
 
     - name: Upload VSCode extension artifacts
       uses: actions/upload-artifact@v3
