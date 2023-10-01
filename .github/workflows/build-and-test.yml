@@ -52,12 +52,23 @@ jobs:
 
     runs-on: ${{ matrix.host.os }}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
     - uses: actions/setup-node@v3
       with:
         node-version: 20
+
+    # - name: Checkout
+    #   uses: actions/checkout@v3
+
+    - uses: robinraju/release-downloader@v1.8
+      with:
+        # The source repository path.
+        # Expected format {owner}/{repo}
+        # Default: ${{ github.repository }}
+        repository: koliyo/hylo-lsp
+        tag: "v0.5.0"
+        # extract: true
+
+    - run: ls -R
 
     - name: Package VSCode extension (${{ matrix.configuration }})
       run: |
