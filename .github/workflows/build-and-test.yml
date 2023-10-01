@@ -52,12 +52,12 @@ jobs:
 
     runs-on: ${{ matrix.host.os }}
     steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
     - uses: actions/setup-node@v3
       with:
         node-version: 20
-
-    # - name: Checkout
-    #   uses: actions/checkout@v3
 
     - uses: robinraju/release-downloader@v1.8
       with:
@@ -66,10 +66,8 @@ jobs:
         # Default: ${{ github.repository }}
         repository: koliyo/hylo-lsp
         tag: "v0.5.1"
-        extract: true
+        extract: false
         out-file-path: hylo-lsp-artifacts
-
-    - run: ls -R
 
     - name: Package VSCode extension
       run: |
@@ -77,6 +75,7 @@ jobs:
         DIST_DIR=dist
         mkdir -p $DIST_DIR
         rm -rf $DIST_DIR/stdlib
+        tar -xvf hylo-stdlib.tar.gz
         mv hylo-stdlib $DIST_DIR/stdlib
         mkdir -p $DIST_DIR/bin/mac/arm64
         mv hylo-lsp-artifacts/hylo-lsp-server $DIST_DIR/bin/mac/arm64/
