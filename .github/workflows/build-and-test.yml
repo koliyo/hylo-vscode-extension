@@ -70,7 +70,7 @@ jobs:
 
     - run: ls -R
 
-    - name: Package VSCode extension (${{ matrix.configuration }})
+    - name: Package VSCode extension
       run: |
         set -eo pipefail
         # BUILD_DIR=$(swift build -c ${{ matrix.configuration }} --show-bin-path)
@@ -84,12 +84,10 @@ jobs:
         # npm install
         # npm run vscode:package
 
-    # - name: Upload VSCode extension artifacts (${{ matrix.configuration }})
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: vscode-extension-artifacts
-    #     path: |
-    #       hylo-vscode-extension/*.vsix
-    #       dist
-    #       !dist/**/*.md
+    - name: Upload VSCode extension artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: vscode-extension-artifacts
+        path: |
+          *.vsix
 
