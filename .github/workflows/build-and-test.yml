@@ -21,7 +21,7 @@ name: Build and test
 on:
   workflow_call:
   push:
-    # tags: ["v*.*.*"]
+    tags: ["v*.*.*"]
     branches: [ main ]
     paths-ignore:
       - "Docs/**"
@@ -29,14 +29,14 @@ on:
       - "README.md"
       - "LICENSE"
       - ".gitignore"
-  pull_request:
-    branches: [ "**" ]
-    paths-ignore:
-      - "Docs/**"
-      - "**.md"
-      - "README.md"
-      - "LICENSE"
-      - ".gitignore"
+  # pull_request:
+  #   branches: [ "**" ]
+  #   paths-ignore:
+  #     - "Docs/**"
+  #     - "**.md"
+  #     - "README.md"
+  #     - "LICENSE"
+  #     - ".gitignore"
 
 jobs:
   package-vscode-extension:
@@ -65,7 +65,7 @@ jobs:
         # Expected format {owner}/{repo}
         # Default: ${{ github.repository }}
         repository: koliyo/hylo-lsp
-        tag: "v0.5.1"
+        tag: ${{github.ref_name}}
         extract: false
         out-file-path: hylo-lsp-artifacts
 
