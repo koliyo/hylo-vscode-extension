@@ -73,12 +73,14 @@ jobs:
       run: |
         set -eo pipefail
         DIST_DIR=dist
+        ARTIFACTS_DIR=hylo-lsp-artifacts
         mkdir -p $DIST_DIR
         rm -rf $DIST_DIR/stdlib
-        tar -xvf hylo-stdlib.tar.gz
+        tar -xvf $ARTIFACTS_DIR/hylo-stdlib.tar.gz
+        tar -xvf $ARTIFACTS_DIR/hylo-lsp-mac.tar.gz
         mv hylo-stdlib $DIST_DIR/stdlib
         mkdir -p $DIST_DIR/bin/mac/arm64
-        mv hylo-lsp-artifacts/hylo-lsp-server $DIST_DIR/bin/mac/arm64/
+        mv hylo-lsp-mac/hylo-lsp-server $DIST_DIR/bin/mac/arm64/
         npm install
         npm run vscode:package
 
