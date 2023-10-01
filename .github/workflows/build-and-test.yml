@@ -21,7 +21,7 @@ name: Build and test
 on:
   workflow_call:
   push:
-    tags: ["v*.*.*"]
+    # tags: ["v*.*.*"]
     branches: [ main ]
     paths-ignore:
       - "Docs/**"
@@ -41,16 +41,7 @@ on:
 jobs:
   package-vscode-extension:
     name: "Package VSCode extension"
-    strategy:
-      fail-fast: false
-      matrix:
-        host: [
-          {
-            type: linux, os: ubuntu-latest,
-          }
-        ]
-
-    runs-on: ${{ matrix.host.os }}
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
