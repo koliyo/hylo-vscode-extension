@@ -39,8 +39,8 @@ on:
       - ".gitignore"
 
 jobs:
-  build-vscode-extension:
-    name: "Native: ${{ matrix.host.os }}/${{ matrix.configuration }}"
+  package-vscode-extension:
+    name: "Package VSCode extension"
     strategy:
       fail-fast: false
       matrix:
