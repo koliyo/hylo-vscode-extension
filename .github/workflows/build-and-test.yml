@@ -29,14 +29,14 @@ on:
       - "README.md"
       - "LICENSE"
       - ".gitignore"
-  # pull_request:
-  #   branches: [ "**" ]
-  #   paths-ignore:
-  #     - "Docs/**"
-  #     - "**.md"
-  #     - "README.md"
-  #     - "LICENSE"
-  #     - ".gitignore"
+  pull_request:
+    branches: [ "**" ]
+    paths-ignore:
+      - "Docs/**"
+      - "**.md"
+      - "README.md"
+      - "LICENSE"
+      - ".gitignore"
 
 jobs:
   package-vscode-extension:
@@ -50,29 +50,26 @@ jobs:
       with:
         node-version: 20
 
-    - uses: robinraju/release-downloader@v1.8
-      with:
-        # The source repository path.
-        # Expected format {owner}/{repo}
-        # Default: ${{ github.repository }}
-        repository: koliyo/hylo-lsp
-        latest: ${{ github.ref == 'refs/heads/main' && 'true' || 'false' }}
-        tag: ${{ github.ref == 'refs/heads/main' && '' || format(github.ref_name) }}
-        extract: false
-        out-file-path: hylo-lsp-artifacts
+    # - uses: robinraju/release-downloader@v1.8
+    #   with:
+    #     repository: koliyo/hylo-lsp
+    #     latest: ${{ github.ref == 'refs/heads/main' && 'true' || 'false' }}
+    #     tag: ${{ github.ref == 'refs/heads/main' && '' || format(github.ref_name) }}
+    #     extract: false
+    #     out-file-path: hylo-lsp-artifacts
 
     - name: Package VSCode extension
       run: |
         set -eo pipefail
-        DIST_DIR=dist
-        ARTIFACTS_DIR=hylo-lsp-artifacts
-        mkdir -p $DIST_DIR
-        rm -rf $DIST_DIR/stdlib
-        tar -xvf $ARTIFACTS_DIR/hylo-stdlib.tar.gz
-        tar -xvf $ARTIFACTS_DIR/hylo-lsp-mac.tar.gz
-        mv hylo-stdlib $DIST_DIR/stdlib
-        mkdir -p $DIST_DIR/bin/mac/arm64
-        mv hylo-lsp-mac/hylo-lsp-server $DIST_DIR/bin/mac/arm64/
+        # DIST_DIR=dist
+        # ARTIFACTS_DIR=hylo-lsp-artifacts
+        # mkdir -p $DIST_DIR
+        # rm -rf $DIST_DIR/stdlib
+        # tar -xvf $ARTIFACTS_DIR/hylo-stdlib.tar.gz
+        # tar -xvf $ARTIFACTS_DIR/hylo-lsp-mac-x64.tar.gz
+        # mv hylo-stdlib $DIST_DIR/stdlib
+        # mkdir -p $DIST_DIR/bin/mac/arm64
+        # mv hylo-lsp-mac-x64/hylo-lsp-server $DIST_DIR/bin/mac/arm64/
         npm install
         npm run vscode:package
 
