@@ -79,9 +79,10 @@ async function activateBackend(context: ExtensionContext) {
     serverExe = '/Users/nils/Work/hylo-lsp/.build/arm64-apple-macosx/debug/hylo-lsp-server'
   }
   else {
-    if (!await updateLspServer()) {
-      return
-    }
+    // Check if update is available
+    // NOTE: We continue launch process even if update fails, because we can still have working local install
+    await updateLspServer()
+
     // hyloRoot = hyloLpsConfig.get('rootDirectory')!
     // if (!hyloRoot) {
     //   await window.showErrorMessage(`Must define \`hylo.rootDirectory\` in settings`)
@@ -97,7 +98,7 @@ async function activateBackend(context: ExtensionContext) {
 
   wrappedOutput.appendLine(`Hylo root directory: ${hyloRoot}, lsp server executable: ${serverExe}`)
 
-  let transport = TransportKind.pipe
+  let transport = TransportKind.stdio
 
   let executable: Executable = {
     command: serverExe,
