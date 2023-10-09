@@ -36,6 +36,7 @@ import { updateLspServer } from './download-hylo-lsp'
 // import * as fs from 'fs'
 // import * as path from 'path'
 import * as WebSocket from 'ws'
+import * as os from 'os'
 
 // https://code.visualstudio.com/api/language-extensions/language-server-extension-guide
 let client: LanguageClient
@@ -56,6 +57,14 @@ function expandvars(s: string) {
 let hyloLpsConfig: WorkspaceConfiguration
 let isDebug = process.env.VSCODE_DEBUG_MODE !== undefined
 
+function lspExecutableFilename(): string {
+  switch (os.type()) {
+    case 'Darwin': return 'hylo-lsp-server'
+    case 'Linux': return 'hylo-lsp-server'
+    case 'Windows_NT': return 'hylo-lsp-server.exe'
+    default: throw `Unknown os type: ${os.type()}`
+  }
+}
 
 async function activateBackend(context: ExtensionContext) {
 
@@ -69,14 +78,13 @@ async function activateBackend(context: ExtensionContext) {
 
   wrappedOutput.appendLine(`Working directory: ${process.cwd()}, activeDebugSession: ${debug.activeDebugSession}, isDebug: ${isDebug}, __filename: ${__filename}`)
 
-  let serverExe: string
+  let serverExe = `${context.extensionPath}/dist/bin/${lspExecutableFilename()}`
 
   let hyloRoot = undefined
   let env = process.env;
 
   if (isDebug) {
     hyloRoot = `${context.extensionPath}/../..`
-    serverExe = '/Users/nils/Work/hylo-lsp/.build/arm64-apple-macosx/debug/hylo-lsp-server'
   }
   else {
     // Check if update is available
@@ -90,11 +98,7 @@ async function activateBackend(context: ExtensionContext) {
 
     // hyloRoot = expandvars(hyloRoot)
     env['HYLO_STDLIB_PATH'] = `${context.extensionPath}/dist/hylo-stdlib`
-    // serverExe = `${context.extensionPath}/dist/bin/mac/arm64/hylo-lsp-server`
-    serverExe = `${context.extensionPath}/dist/bin/hylo-lsp-server`
   }
-
-
 
   wrappedOutput.appendLine(`Hylo root directory: ${hyloRoot}, lsp server executable: ${serverExe}`)
 
