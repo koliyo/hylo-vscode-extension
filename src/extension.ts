@@ -79,14 +79,16 @@ async function activateBackend(context: ExtensionContext) {
     serverExe = '/Users/nils/Work/hylo-lsp/.build/arm64-apple-macosx/debug/hylo-lsp-server'
   }
   else {
-    await updateLspServer()
+    if (!await updateLspServer()) {
+      return
+    }
     // hyloRoot = hyloLpsConfig.get('rootDirectory')!
     // if (!hyloRoot) {
     //   await window.showErrorMessage(`Must define \`hylo.rootDirectory\` in settings`)
     // }
 
     // hyloRoot = expandvars(hyloRoot)
-    env['HYLO_STDLIB_PATH'] = `${context.extensionPath}/dist/stdlib`
+    env['HYLO_STDLIB_PATH'] = `${context.extensionPath}/dist/hylo-stdlib`
     // serverExe = `${context.extensionPath}/dist/bin/mac/arm64/hylo-lsp-server`
     serverExe = `${context.extensionPath}/dist/bin/hylo-lsp-server`
   }

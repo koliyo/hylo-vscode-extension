@@ -53,3 +53,8 @@ export function createOutputChannels(isDebug: boolean) {
   }
 
 }
+
+export function notifyError(message: string) {
+  wrappedOutput.appendLine(message)
+  window.showErrorMessage(message)
+}

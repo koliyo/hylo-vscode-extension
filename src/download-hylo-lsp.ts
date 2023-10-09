@@ -9,11 +9,13 @@ import { Readable } from 'stream'
 import { finished } from 'stream/promises'
 import * as os from 'os'
 
-import { wrappedOutput } from './output-channels'
+import { wrappedOutput, notifyError } from './output-channels'
 
 const releaseUrl = 'https://api.github.com/repos/koliyo/hylo-lsp/releases/latest'
-const lspDirectory = 'dist/bin'
+const distDirectory = 'dist'
+const lspDirectory = `${distDirectory}/bin`
 const manifestPath = `${lspDirectory}/manifest.json`
+const stdlibAssetFilename = 'hylo-stdlib.zip'
 
 function getTargetLspFilename(): string {
   switch (os.type()) {
@@ -97,8 +99,10 @@ function getInstalledVersion(): VersionData | null {
   }
 }
 
-export async function updateLspServer() {
+export async function updateLspServer(): Promise<boolean> {
   try {
+    wrappedOutput.appendLine(`Check for new release: ${releaseUrl}`)
+
     const response = await fetch(releaseUrl)
     const body = await response.text()
     const data = JSON.parse(body)
@@ -109,33 +113,52 @@ export async function updateLspServer() {
 
     if (latestVersion.equals(localVersion)) {
       wrappedOutput.appendLine(`Installed version is up-to-date: ${localVersion}, LSP target artifact: ${target}`)
-      return
+      return true
     }
 
     if (!fs.existsSync(lspDirectory)) {
       fs.mkdirSync(lspDirectory, { recursive: true });
     }
 
-    const asset = data.assets.find((a: any) => a.name === target)
+    const lspAsset = data.assets.find((a: any) => a.name === target)
 
-    if (!asset) {
-      wrappedOutput.appendLine(`Could not find matching release asset for target: ${target}`)
+    if (!lspAsset) {
+      notifyError(`Could not find matching release asset for target: ${target}`)
+      return false
     }
 
-    const targetFilepath = path.resolve(lspDirectory, target);
+    const stdlibAsset = data.assets.find((a: any) => a.name === stdlibAssetFilename)
 
-    const url = asset.browser_download_url
-    const indentedManifest = JSON.stringify(data, null, '  ')
+    if (!stdlibAsset) {
+      notifyError(`Could not find stdlib release asset: ${stdlibAssetFilename}`)
+      return true
+    }
 
-    wrappedOutput.appendLine(`Download LSP server: ${url}`)
-    await downloadFile(url, lspDirectory)
+    const lspUrl = lspAsset.browser_download_url
+    const stdlibUrl = stdlibAsset.browser_download_url
+
+    const targetLspFilepath = path.resolve(distDirectory, target);
+    const targetStdlibFilepath = path.resolve(distDirectory, stdlibAssetFilename);
+
+
+    wrappedOutput.appendLine(`Download LSP server: ${lspUrl}`)
+    await downloadFile(lspUrl, distDirectory)
+
+    wrappedOutput.appendLine(`Unzip LSP archive: ${targetLspFilepath}`)
+    decompress(targetLspFilepath, lspDirectory, { strip: 1 })
+
+    wrappedOutput.appendLine(`Download stdlib: ${stdlibUrl}`)
+    await downloadFile(stdlibUrl, distDirectory)
+
+    wrappedOutput.appendLine(`Unzip stdlib archive: ${targetStdlibFilepath}`)
+    decompress(targetStdlibFilepath, distDirectory)
 
     wrappedOutput.appendLine(`Write manifest: ${path.resolve(manifestPath)}`)
-    fs.writeFileSync(manifestPath, indentedManifest);
-
-    wrappedOutput.appendLine(`Unzip archive: ${targetFilepath}`)
-    decompress(targetFilepath, lspDirectory, { strip: 1 })
+    const indentedManifest = JSON.stringify(data, null, '  ')
+    fs.writeFileSync(manifestPath, indentedManifest)
+    return true
   } catch (error) {
-    wrappedOutput.appendLine(`[updateLspServer] Exception: ${error}`);
+    notifyError(`[updateLspServer] Exception: ${error}`);
+    return false
   }
 }
