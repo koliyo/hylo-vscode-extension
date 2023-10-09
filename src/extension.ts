@@ -30,9 +30,11 @@ import {
   Trace
 } from 'vscode-languageclient/node'
 
-import * as fs from 'fs'
-import * as path from 'path'
+import { createOutputChannels, wrappedOutput, setOutputSocket } from './output-channels'
+import { updateLspServer } from './download-hylo-lsp'
 
+// import * as fs from 'fs'
+// import * as path from 'path'
 import * as WebSocket from 'ws'
 
 // https://code.visualstudio.com/api/language-extensions/language-server-extension-guide
@@ -50,65 +52,9 @@ function expandvars(s: string) {
   return expandvars_windows(expandvars_posix(s))
 }
 
-let defaultOutput: OutputChannel
-let wrappedOutput: OutputChannel
+
 let hyloLpsConfig: WorkspaceConfiguration
 let isDebug = process.env.VSCODE_DEBUG_MODE !== undefined
-
-function createOutputChannels() {
-  defaultOutput = window.createOutputChannel('Hylo')
-
-  let socket: WebSocket | null = null
-
-  let log = ''
-  wrappedOutput = {
-    name: 'wrapped',
-    // Only append the logs but send them later
-    append(value: string) {
-      log += value
-      // console.log(value)
-      defaultOutput.append(value)
-    },
-    appendLine(value: string) {
-      log += value
-
-      defaultOutput.appendLine(value)
-
-      if (isDebug) {
-        console.log(log)
-      }
-
-      // Don't send logs until WebSocket initialization
-      if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(log)
-      }
-
-      log = ''
-    },
-    replace(value: string) {
-      log = value
-      // if (isDebug) {
-      //     console.log(value)
-      // }
-      // defaultOutput.appendLine(value)
-    },
-
-    clear() { },
-    show() { },
-    hide() { },
-    dispose() { }
-  }
-
-
-  commands.registerCommand('hylo.startLspLogStreaming', () => {
-    const socketPort = workspace.getConfiguration('lspInspector')?.get('port')
-    // const socketPort = hyloLpsConfig.get('lspLogPort', 7000)
-    const lspStreamUrl = `ws://localhost:${socketPort}`
-    wrappedOutput.appendLine(`Begin streaming lsp messages: ${lspStreamUrl}`)
-    socket = new WebSocket(lspStreamUrl)
-  })
-
-}
 
 
 async function activateBackend(context: ExtensionContext) {
@@ -119,11 +65,10 @@ async function activateBackend(context: ExtensionContext) {
     return
   }
 
-  // If the extension is launched in debug mode then the debug server options are used
-  // Otherwise the run options are used
-  wrappedOutput.appendLine(`Working directory: ${process.cwd()}, activeDebugSession: ${debug.activeDebugSession}, isDebug: ${isDebug}`)
-  wrappedOutput.appendLine(`__filename: ${__filename}`)
-  // The server is implemented in node
+  process.chdir(context.extensionPath)
+
+  wrappedOutput.appendLine(`Working directory: ${process.cwd()}, activeDebugSession: ${debug.activeDebugSession}, isDebug: ${isDebug}, __filename: ${__filename}`)
+
   let serverExe: string
 
   let hyloRoot = undefined
@@ -134,14 +79,18 @@ async function activateBackend(context: ExtensionContext) {
     serverExe = '/Users/nils/Work/hylo-lsp/.build/arm64-apple-macosx/debug/hylo-lsp-server'
   }
   else {
+    if (!await updateLspServer()) {
+      return
+    }
     // hyloRoot = hyloLpsConfig.get('rootDirectory')!
     // if (!hyloRoot) {
     //   await window.showErrorMessage(`Must define \`hylo.rootDirectory\` in settings`)
     // }
 
     // hyloRoot = expandvars(hyloRoot)
-    env['HYLO_STDLIB_PATH'] = `${context.extensionPath}/dist/stdlib`
-    serverExe = `${context.extensionPath}/dist/bin/mac/arm64/hylo-lsp-server`
+    env['HYLO_STDLIB_PATH'] = `${context.extensionPath}/dist/hylo-stdlib`
+    // serverExe = `${context.extensionPath}/dist/bin/mac/arm64/hylo-lsp-server`
+    serverExe = `${context.extensionPath}/dist/bin/hylo-lsp-server`
   }
 
 
@@ -197,20 +146,39 @@ async function activateBackend(context: ExtensionContext) {
 
   p.finally(() => {
     wrappedOutput.appendLine(`Client finally`)
-
   });
-
 }
 
 export async function activate(context: ExtensionContext) {
 
   hyloLpsConfig = workspace.getConfiguration('hylo')
-  createOutputChannels()
+  createOutputChannels(isDebug)
   wrappedOutput.appendLine(`Activate LSP client in directory ${context.extensionPath}`)
+
+  registerCommands()
+
   // await activateSyntax(context)
   await activateBackend(context)
 }
 
+function registerCommands() {
+
+  commands.registerCommand('hylo.updateLspServer', async () => {
+    await updateLspServer()
+  })
+
+  commands.registerCommand('hylo.restartLspServer', async () => {
+    await client.restart()
+  })
+
+  // commands.registerCommand('hylo.startLspLogStreaming', () => {
+  //   const socketPort = workspace.getConfiguration('lspInspector')?.get('port')
+  //   // const socketPort = hyloLpsConfig.get('lspLogPort', 7000)
+  //   const lspStreamUrl = `ws://localhost:${socketPort}`
+  //   wrappedOutput.appendLine(`Begin streaming lsp messages: ${lspStreamUrl}`)
+  //   setOutputSocket(new WebSocket(lspStreamUrl))
+  // })
+}
 
 export function deactivate() {
   if (!client) {
