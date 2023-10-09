@@ -30,7 +30,7 @@ async function downloadFile(url: string, directory=".") {
   const fileName = path.basename(url);
   const destination = path.resolve(directory, fileName);
   const size = Number(res.headers.get('Content-Length'))
-  wrappedOutput.appendLine(`Download: ${url}, size: ${size/1024} KB, destination: ${destination}`)
+  // wrappedOutput.appendLine(`Download: ${url}, size: ${size/1024} KB, destination: ${destination}`)
   let from_stream = Readable.from(res.body!);
   // let to_stream   = fs.createWriteStream(fileName, { flags: 'wx' });
   let to_stream = fs.createWriteStream(destination);
@@ -105,9 +105,10 @@ export async function updateLspServer() {
 
     const latestVersion = VersionData.fromJsonData(data)
     const localVersion = getInstalledVersion()
+    const target = getTargetLspFilename()
 
     if (latestVersion.equals(localVersion)) {
-      wrappedOutput.appendLine(`Installed version is up-to-date: ${localVersion}`)
+      wrappedOutput.appendLine(`Installed version is up-to-date: ${localVersion}, LSP target artifact: ${target}`)
       return
     }
 
@@ -115,7 +116,6 @@ export async function updateLspServer() {
       fs.mkdirSync(lspDirectory, { recursive: true });
     }
 
-    const target = getTargetLspFilename()
     const asset = data.assets.find((a: any) => a.name === target)
 
     if (!asset) {
@@ -130,7 +130,7 @@ export async function updateLspServer() {
     wrappedOutput.appendLine(`Download LSP server: ${url}`)
     await downloadFile(url, lspDirectory)
 
-    wrappedOutput.appendLine(`Write manifest: ${manifestPath}`)
+    wrappedOutput.appendLine(`Write manifest: ${path.resolve(manifestPath)}`)
     fs.writeFileSync(manifestPath, indentedManifest);
 
     wrappedOutput.appendLine(`Unzip archive: ${targetFilepath}`)
