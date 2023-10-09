@@ -4,18 +4,12 @@ import fetch from 'node-fetch'
 // import * as https from 'https'
 import * as fs from 'fs'
 import * as path from 'path'
-// import { mkdir, writeFile, readFile } from 'fs/promises'
+// import { mkdir, writeFile, readFile, rm } from 'fs/promises'
 import { Readable } from 'stream'
 import { finished } from 'stream/promises'
 import * as os from 'os'
 
 import { wrappedOutput, notifyError } from './output-channels'
-
-const releaseUrl = 'https://api.github.com/repos/koliyo/hylo-lsp/releases/latest'
-const distDirectory = 'dist'
-const lspDirectory = `${distDirectory}/bin`
-const manifestPath = `${lspDirectory}/manifest.json`
-const stdlibAssetFilename = 'hylo-stdlib.zip'
 
 function getTargetLspFilename(): string {
   switch (os.type()) {
@@ -84,6 +78,8 @@ class VersionData {
 
 function getInstalledVersion(): VersionData | null {
   try {
+    const manifestPath = `dist/manifest.json`
+
     if (!fs.existsSync(manifestPath)) {
       return null
     }
@@ -101,6 +97,13 @@ function getInstalledVersion(): VersionData | null {
 
 export async function updateLspServer(): Promise<boolean> {
   try {
+    const releaseUrl = 'https://api.github.com/repos/koliyo/hylo-lsp/releases/latest'
+    const distDirectory = 'dist'
+    const lspDirectory = `${distDirectory}/bin`
+    const stdlibDirectory = `${distDirectory}/hylo-stdlib`
+    const stdlibAssetFilename = 'hylo-stdlib.zip'
+    const manifestPath = `${distDirectory}/manifest.json`
+
     wrappedOutput.appendLine(`Check for new release: ${releaseUrl}`)
 
     const response = await fetch(releaseUrl)
@@ -116,8 +119,10 @@ export async function updateLspServer(): Promise<boolean> {
       return true
     }
 
-    if (!fs.existsSync(lspDirectory)) {
-      fs.mkdirSync(lspDirectory, { recursive: true });
+    wrappedOutput.appendLine(`Installation of new LSP release required\nlocal version: ${localVersion}\nlatest version: ${latestVersion}`)
+
+    if (!fs.existsSync(distDirectory)) {
+      fs.mkdirSync(distDirectory, { recursive: true });
     }
 
     const lspAsset = data.assets.find((a: any) => a.name === target)
@@ -140,22 +145,41 @@ export async function updateLspServer(): Promise<boolean> {
     const targetLspFilepath = path.resolve(distDirectory, target);
     const targetStdlibFilepath = path.resolve(distDirectory, stdlibAssetFilename);
 
-
+    // Download release artifacts
     wrappedOutput.appendLine(`Download LSP server: ${lspUrl}`)
     await downloadFile(lspUrl, distDirectory)
-
-    wrappedOutput.appendLine(`Unzip LSP archive: ${targetLspFilepath}`)
-    decompress(targetLspFilepath, lspDirectory, { strip: 1 })
 
     wrappedOutput.appendLine(`Download stdlib: ${stdlibUrl}`)
     await downloadFile(stdlibUrl, distDirectory)
 
+
+    // Delete outdated local artifacts
+    if (fs.existsSync(stdlibDirectory)) {
+      wrappedOutput.appendLine(`Delete outdated stdlib: ${stdlibDirectory}`)
+      fs.rmSync(stdlibDirectory, { recursive: true, force: true })
+    }
+
+    if (fs.existsSync(lspDirectory)) {
+      // NOTE: We delete whole directory to not have to deal with naming and windows extension etc
+      wrappedOutput.appendLine(`Delete outdated lsp executable in: ${stdlibDirectory}`)
+      fs.rmSync(lspDirectory, { recursive: true, force: true })
+    }
+
+    if (!fs.existsSync(lspDirectory)) {
+      fs.mkdirSync(lspDirectory, { recursive: true });
+    }
+
+    // Extract updated artifacts
+    wrappedOutput.appendLine(`Unzip LSP archive: ${targetLspFilepath}`)
+    await decompress(targetLspFilepath, lspDirectory, { strip: 1 })
+
     wrappedOutput.appendLine(`Unzip stdlib archive: ${targetStdlibFilepath}`)
-    decompress(targetStdlibFilepath, distDirectory)
+    await decompress(targetStdlibFilepath, distDirectory)
 
     wrappedOutput.appendLine(`Write manifest: ${path.resolve(manifestPath)}`)
     const indentedManifest = JSON.stringify(data, null, '  ')
     fs.writeFileSync(manifestPath, indentedManifest)
+
     return true
   } catch (error) {
     notifyError(`[updateLspServer] Exception: ${error}`);
