@@ -53,6 +53,11 @@ class VersionData {
   name: string
   publishDate: Date
 
+  public get isDev() {
+    return this.name == 'dev'
+  }
+
+
   constructor(id: number, name: string, publishDate: Date) {
     this.id = id
     this.name = name
@@ -76,7 +81,7 @@ class VersionData {
 }
 
 
-function getInstalledVersion(): VersionData | null {
+export function getInstalledVersion(): VersionData | null {
   try {
     const manifestPath = `dist/manifest.json`
 
@@ -113,6 +118,11 @@ export async function updateLspServer(): Promise<boolean> {
     const latestVersion = VersionData.fromJsonData(data)
     const localVersion = getInstalledVersion()
     const target = getTargetLspFilename()
+
+    if (localVersion?.isDev) {
+      wrappedOutput.appendLine(`Dev version detected: ${localVersion}`)
+      return true
+    }
 
     if (latestVersion.equals(localVersion)) {
       wrappedOutput.appendLine(`Installed version is up-to-date: ${localVersion}, LSP target artifact: ${target}`)

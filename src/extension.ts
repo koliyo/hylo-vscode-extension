@@ -31,7 +31,7 @@ import {
 } from 'vscode-languageclient/node'
 
 import { createOutputChannels, wrappedOutput, setOutputSocket } from './output-channels'
-import { updateLspServer } from './download-hylo-lsp'
+import { updateLspServer, getInstalledVersion } from './download-hylo-lsp'
 
 // import * as fs from 'fs'
 // import * as path from 'path'
@@ -100,9 +100,11 @@ async function activateBackend(context: ExtensionContext) {
     env['HYLO_STDLIB_PATH'] = `${context.extensionPath}/dist/hylo-stdlib`
   }
 
+  let installedVersion = getInstalledVersion()!
+
   wrappedOutput.appendLine(`Hylo root directory: ${hyloRoot}, lsp server executable: ${serverExe}`)
 
-  let transport = TransportKind.stdio
+  let transport = installedVersion.isDev ? TransportKind.pipe : TransportKind.stdio
 
   let executable: Executable = {
     command: serverExe,
