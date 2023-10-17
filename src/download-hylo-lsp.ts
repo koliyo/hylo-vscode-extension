@@ -1,5 +1,5 @@
-import * as decompress from 'decompress'
-// import decompress from 'decompress'
+// import * as decompress from 'decompress'
+import decompress from 'decompress'
 import fetch from 'node-fetch'
 // import * as https from 'https'
 import * as fs from 'fs'
