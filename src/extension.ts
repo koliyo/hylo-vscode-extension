@@ -101,10 +101,9 @@ async function activateBackend(context: ExtensionContext) {
   }
 
   let installedVersion = getInstalledVersion()!
-
-  wrappedOutput.appendLine(`Hylo root directory: ${hyloRoot}, lsp server executable: ${serverExe}`)
-
   let transport = installedVersion.isDev ? TransportKind.pipe : TransportKind.stdio
+
+  wrappedOutput.appendLine(`Hylo root directory: ${hyloRoot}, lsp server executable: ${serverExe}, transport: ${transport}`)
 
   let executable: Executable = {
     command: serverExe,
