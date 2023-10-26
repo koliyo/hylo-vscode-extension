@@ -1,17 +1,10 @@
 import { OutputChannel, window } from "vscode"
-import * as WebSocket from 'ws'
 
 export let defaultOutput: OutputChannel
 export let wrappedOutput: OutputChannel
-let outputSocket: WebSocket | null = null
-
-export function setOutputSocket(socket: WebSocket) {
-  outputSocket = socket
-}
 
 export function createOutputChannels(isDebug: boolean) {
   defaultOutput = window.createOutputChannel('Hylo')
-
 
   let log = ''
   wrappedOutput = {
@@ -29,11 +22,6 @@ export function createOutputChannels(isDebug: boolean) {
 
       if (isDebug) {
         console.log(log)
-      }
-
-      // Don't send logs until WebSocket initialization
-      if (outputSocket && outputSocket.readyState === WebSocket.OPEN) {
-        outputSocket.send(log)
       }
 
       log = ''

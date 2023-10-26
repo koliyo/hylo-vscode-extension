@@ -35,7 +35,6 @@ import { updateLspServer, getInstalledVersion } from './download-hylo-lsp'
 
 // import * as fs from 'fs'
 // import * as path from 'path'
-import * as WebSocket from 'ws'
 import * as os from 'os'
 
 // https://code.visualstudio.com/api/language-extensions/language-server-extension-guide
@@ -136,7 +135,6 @@ async function activateBackend(context: ExtensionContext) {
     },
 
     outputChannel: wrappedOutput,
-    // traceOutputChannel: websocketOutputChannel,
     revealOutputChannelOn: RevealOutputChannelOn.Info,
   }
 
@@ -182,7 +180,6 @@ function registerCommands() {
   //   // const socketPort = hyloLpsConfig.get('lspLogPort', 7000)
   //   const lspStreamUrl = `ws://localhost:${socketPort}`
   //   wrappedOutput.appendLine(`Begin streaming lsp messages: ${lspStreamUrl}`)
-  //   setOutputSocket(new WebSocket(lspStreamUrl))
   // })
 }
 
