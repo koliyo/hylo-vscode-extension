@@ -97,65 +97,16 @@
     "commands": [
       {
         "command": "hylo.restartLspServer",
-        "title": "Restart Hylo LSP server"
+        "title": "Hylo: Restart LSP server"
       },
       {
         "command": "hylo.updateLspServer",
-        "title": "Make sure Hylo LSP server is up-to-date"
+        "title": "Hylo: Make sure LSP server is up-to-date"
       }
     ],
     "configuration": {
-      "title": "{Syntax Highlighter} configuration",
+      "title": "Hylo",
       "properties": {
-        "hylo.lspTransport": {
-          "type": "string",
-          "scope": "window",
-          "description": "LSP transport mechanism",
-          "default": "stdio",
-          "enum": [
-            "stdio",
-            "pipe"
-          ]
-        },
-        "hylo.rootDirectory": {
-          "type": "string",
-          "scope": "window",
-          "description": "Path to hylo directory"
-        },
-        "hylo.disableLsp": {
-          "type": "boolean",
-          "default": false,
-          "scope": "window",
-          "description": "Disable LSP backend, only provide syntax highlighting."
-        },
-        "hylo.trace.server": {
-          "scope": "window",
-          "type": "object",
-          "description": "Traces the communication between VS Code and the language server.",
-          "default": {
-            "verbosity": "messages",
-            "format": "text"
-          },
-          "properties": {
-            "verbosity": {
-              "type": "string",
-              "description": "Controls the verbosity of the trace.",
-              "enum": [
-                "off",
-                "messages",
-                "verbose"
-              ]
-            },
-            "format": {
-              "type": "string",
-              "description": "Controls the output format of the trace.",
-              "enum": [
-                "text",
-                "json"
-              ]
-            }
-          }
-        }
       }
     }
   }

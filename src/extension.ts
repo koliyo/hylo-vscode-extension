@@ -67,12 +67,6 @@ function lspExecutableFilename(): string {
 
 async function activateBackend(context: ExtensionContext) {
 
-  const disableLsp = hyloLpsConfig.get('disableLsp', false)
-  if (disableLsp && !isDebug) {
-    wrappedOutput.appendLine("LSP backend is disabled")
-    return
-  }
-
   process.chdir(context.extensionPath)
 
   wrappedOutput.appendLine(`Working directory: ${process.cwd()}, activeDebugSession: ${debug.activeDebugSession}, isDebug: ${isDebug}, __filename: ${__filename}`)
