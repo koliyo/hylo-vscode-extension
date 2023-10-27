@@ -2,7 +2,7 @@
 
 All notable changes to the "hylo-vscode" extension will be documented in this file.
 
-## 0.7.1 - 2023-10-27
+## v0.7.1 - 2023-10-27
 
 First documented release
 
