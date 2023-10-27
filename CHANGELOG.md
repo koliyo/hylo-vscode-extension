@@ -1,9 +1,11 @@
 # Change Log
 
-All notable changes to the "hyloc-lsp" extension will be documented in this file.
+All notable changes to the "hylo-vscode" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## 0.7.1 - 2023-10-27
 
-## [Unreleased]
+First documented release
 
-- Initial release
+- Dynamically download Hylo LSP server
+  - Download OS/architecture specific LSP binaries
+  - Keep LSP server up-to-date, checked on extension startup

@@ -1,46 +1,7 @@
-# Hylo LSP Extension
+# Hylo Visual Studio Code Extension
 
-TODO
+Support for the [Hylo](https://github.com/hylo-lang/hylo) programming language in Visual Studio Code. The actual language analysis is implemented in the [Hylo LSP](https://github.com/koliyo/hylo-lsp) server, and the extension is a pretty thin wrapper around the LSP.
 
-## Features
+The extension dynamically downloads the most recent version of the Hylo LSP for the current machine OS/architecture.
 
-
-TODO:
-
-```
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-```
-
-## Requirements
-
-// If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-```
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-```
-
-## Known Issues
-
-// Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-
-### 0.5.0
-
-Initial release of Hylo VS Code Extension
+See [Hylo LSP](https://github.com/koliyo/hylo-lsp) for list of supported LSP features.
