@@ -14,9 +14,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onLanguage:hylo"
-  ],
   "main": "./out/main.js",
   "scripts": {
     "vscode:package": "vsce package --no-yarn",
