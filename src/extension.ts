@@ -103,7 +103,7 @@ async function activateBackend(context: ExtensionContext) {
     args: [],
     transport: transport,
     options: {
-      cwd: hyloRoot,
+      cwd: context.extensionPath,
       env: env
     }
   }
