@@ -100,7 +100,7 @@ export function getInstalledVersion(): VersionData | null {
   }
 }
 
-export async function updateLspServer(): Promise<boolean> {
+export async function updateLspServer(overwriteDev: boolean): Promise<boolean> {
   try {
     const releaseUrl = 'https://api.github.com/repos/koliyo/hylo-lsp/releases/latest'
     const distDirectory = 'dist'
@@ -109,7 +109,7 @@ export async function updateLspServer(): Promise<boolean> {
     const stdlibAssetFilename = 'hylo-stdlib.zip'
     const manifestPath = `${distDirectory}/manifest.json`
 
-    wrappedOutput.appendLine(`Check for new release: ${releaseUrl}`)
+    wrappedOutput.appendLine(`Check for new release: ${releaseUrl}, overwriteDev: ${overwriteDev}`)
 
     const response = await fetch(releaseUrl)
     const body = await response.text()
@@ -119,7 +119,7 @@ export async function updateLspServer(): Promise<boolean> {
     const localVersion = getInstalledVersion()
     const target = getTargetLspFilename()
 
-    if (localVersion?.isDev) {
+    if (!overwriteDev && localVersion?.isDev) {
       wrappedOutput.appendLine(`Dev version detected: ${localVersion}`)
       return true
     }

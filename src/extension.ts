@@ -82,7 +82,7 @@ async function activateBackend(context: ExtensionContext) {
   else {
     // Check if update is available
     // NOTE: We continue launch process even if update fails, because we can still have working local install
-    await updateLspServer()
+    await updateLspServer(false)
 
     // hyloRoot = hyloLpsConfig.get('rootDirectory')!
     // if (!hyloRoot) {
@@ -162,7 +162,7 @@ export async function activate(context: ExtensionContext) {
 function registerCommands() {
 
   commands.registerCommand('hylo.updateLspServer', async () => {
-    await updateLspServer()
+    await updateLspServer(true)
   })
 
   commands.registerCommand('hylo.restartLspServer', async () => {

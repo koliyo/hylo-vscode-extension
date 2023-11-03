@@ -22,6 +22,9 @@ jobs:
         workflow: build-and-test.yml
         name: vscode-extension-artifacts
 
+    - name: Extract version changelog
+      run: ./extract_version_changelog.sh ${{ github.ref_name }} >> version_changelog.txt
+
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
@@ -29,3 +32,4 @@ jobs:
           CHANGELOG.md
           LICENSE
           *.vsix
+        body_path: version_changelog.txt
