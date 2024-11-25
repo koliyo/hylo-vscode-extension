@@ -17,7 +17,7 @@ jobs:
 
     - name: Download VSCode extension artifact
       id: download-artifact
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v6
       with:
         workflow: build-and-test.yml
         name: vscode-extension-artifacts
