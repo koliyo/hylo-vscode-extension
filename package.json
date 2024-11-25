@@ -3,6 +3,7 @@
   "displayName": "Hylo",
   "description": "Hylo Language Support for VSCode",
   "license": "MIT",
+  "publisher": "koliyo",
   "version": "0.7.3",
   "repository": {
     "type": "git",
